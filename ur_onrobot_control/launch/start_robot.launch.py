@@ -31,6 +31,8 @@ def launch_setup(context, *args, **kwargs):
     headless_mode = LaunchConfiguration("headless_mode")
     launch_dashboard_client = LaunchConfiguration("launch_dashboard_client")
 
+    kinematics_parameters_file = LaunchConfiguration("kinematics_parameters_file")
+
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
@@ -42,6 +44,9 @@ def launch_setup(context, *args, **kwargs):
             " ",
             "ur_type:=",
             ur_type,
+            " ",
+            "kinematics_parameters_file:=",
+            kinematics_parameters_file,
             " ",
             "onrobot_type:=",
             onrobot_type,
@@ -274,7 +279,20 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "robot_ip",
             description="IP address by which the robot can be reached.",
-            default_value="192.168.56.101",  # Uses the Polyscope sim by default
+            default_value="192.168.0.192",  # Uses the Polyscope sim by default
+        )
+    )
+
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "kinematics_parameters_file",
+            default_value=PathJoinSubstitution([
+                FindPackageShare("ur_description"),
+                "config",
+                LaunchConfiguration("ur_type"),
+                "default_kinematics.yaml",
+            ]),
+            description="Robot-specific kinematic calibration file.",
         )
     )
 

@@ -71,9 +71,7 @@ def launch_setup(context, *args, **kwargs):
     joint_limit_params = PathJoinSubstitution(
         [FindPackageShare(ur_description_package), "config", ur_type, "joint_limits.yaml"]
     )
-    kinematics_params = PathJoinSubstitution(
-        [FindPackageShare(ur_description_package), "config", ur_type, "default_kinematics.yaml"]
-    )
+    kinematics_params = LaunchConfiguration("kinematics_parameters_file")
     physical_params = PathJoinSubstitution(
         [FindPackageShare(ur_description_package), "config", ur_type, "physical_parameters.yaml"]
     )
@@ -89,16 +87,16 @@ def launch_setup(context, *args, **kwargs):
             " ",
             "robot_ip:=xxx.yyy.zzz.www",
             " ",
-            "joint_limit_params:=",
+            "joint_limits_parameters_file:=",
             joint_limit_params,
             " ",
-            "kinematics_params:=",
+            "kinematics_parameters_file:=",
             kinematics_params,
             " ",
-            "physical_params:=",
+            "physical_parameters_file:=",
             physical_params,
             " ",
-            "visual_params:=",
+            "visual_parameters_file:=",
             visual_params,
             " ",
             "safety_limits:=",
@@ -125,7 +123,7 @@ def launch_setup(context, *args, **kwargs):
             " ",
             "output_recipe_filename:=rtde_output_recipe.txt",
             " ",
-            "prefix:=",
+            "tf_prefix:=",
             prefix,
             " ",
         ]
@@ -288,6 +286,18 @@ def generate_launch_description():
             "ur_type",
             description="Type/series of used UR robot.",
             choices=["ur3", "ur3e", "ur5", "ur5e", "ur10", "ur10e", "ur16e", "ur20", "ur30"],
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "kinematics_parameters_file",
+            default_value=PathJoinSubstitution([
+                FindPackageShare("ur_description"),
+                "config",
+                LaunchConfiguration("ur_type"),
+                "default_kinematics.yaml",
+            ]),
+            description="Robot-specific calibration file.",
         )
     )
     declared_arguments.append(
